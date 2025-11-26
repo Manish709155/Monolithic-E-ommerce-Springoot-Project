@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  mysql-container:
+    image: mysql:8
+    container_name: mysql-container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ecommerce_application
+    ports:
+      - "3307:3306"   # Change host port from 3306 to 3307
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  ecommerce-app:
+    build: .
+    container_name: ecommerce-app
+    depends_on:
+      - mysql-container
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/ecommerce_application?sessionVariables=sql_mode='TRADITIONAL'&characterEncoding=UTF-8&useUnicode=yes
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    restart: always
+
+volumes:
+  mysql_data:
